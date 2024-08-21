@@ -1,113 +1,90 @@
-/* ADD API KEY HERE*/
-// APP CONSTANTS AND VARS
-const KELVIN = 273;
-// API KEY
-const key = "0e1fdd775b88f31c074e92ab421cc3df"
+document.getElementById('searchbtn').addEventListener('click', function() {
+    const city = document.getElementById('searchval').value.trim();
+    if (city) {
+        getWeather(city);
+        saveSearch(city);
+    }
+});
 
-function getWeather(cityName){
-    let city = cityName
-    // if(!city){
-        city = document.getElementById("searchval").value
-    // }
-    let api = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}`;
-    fetch(api) 
-    .then( function(response){
-        let data = response.json();
-        return data;
-    })
+function getWeather(city) {
+    const apiKey = 'your_api_key_here'; // Replace with your OpenWeatherMap API key
+    const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
-    .then( function(data){
-        var forecast = document.getElementById("forecast")
-        var card = document.createElement("div")
-        card.classList.add("card")
-        var cardBody = document.createElement("div")
-        cardBody.classList.add("card-body")
-        var title = document.createElement("h3")
-        title.classList.add("card-title")
-        title.textContent = data.name
-        var temp = document.createElement("p")
-        temp.classList.add("card-text")
-        temp.textContent = "temp: "+Math.floor(data.main.temp - KELVIN);
-        var image = document.createElement("img")
-        image.setAttribute("src", `https://openweathermap.org/img/w/${data.weather[0].icon}.png`)
-
-        title.appendChild(image)
-        cardBody.appendChild(title)
-        cardBody.appendChild(temp)
-        card.appendChild(cardBody)
-        forecast.appendChild(card)
-    })
-}
-const notificationElement = document.querySelector(".notification");
-const iconElement = document.querySelector(".weatherIcon");
-const tempElement = document.querySelector(".temperatureValue p");
-const descElement = document.querySelector(".temperatureDescription");
-const locationElement = document.querySelector(".location p");
-/*const weather = {
-   temperature : {
-       value : 18,
-       unit : "celsius"
-   },
-   description : "few clouds",
-   iconId : "01d",
-   city : "London",
-   country : "GB"
-};*/
-//  getCurrentPosition(setPosition, error );
-//  setPosition( position )
-//     position.coords.latitude
-//     position.coords.longitude
-    
-//  error(error)
-//  error.message
-    
-// if("geolocation" in navigator){
-//     navigator.geolocation.getCurrentPosition( setPosition, showError );
-// }else{
-//     notificationElement.style.display = "block";
-//     notificationElement.innerHTML = "<p>Browser Doesn't Support Geolocation.</p>"
-// }
-
-function setPosition(position){
-    let latitude = position.coords.latitude;
-    let longitude = position.coords.longitude;
-    getWeather(latitude, longitude);
-}
-function showError(error) {
-    notificationElement.style.display = "block";
-    notificationElement.innerHTML=`<p> ${error.message} </p>`;
+    fetch(currentWeatherUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.cod === 200) {
+                displayCurrentWeather(data);
+                getFiveDayForecast(city, apiKey);
+            } else {
+                alert('City not found! Please try again.');
+            }
+        })
+        .catch(error => console.error('Error fetching weather data:', error));
 }
 
-// tempElement.addEventListener("click", function(){
-//     if (weather.temperature.value === undefined) return;
-//     if (weather.temperature.unit === "celsius" ){
-//        let fahrenheit = celsiusToFahrenheit(weather.temperature.value);
-//        fahrenheit = Math.floor(fahrenheit);
-//        tempElement.innerHTML = `${fahrenheit}° <span>F</span>`;
-//        weather.temperature.unit = "fahrenheit";
-       
-//     }else{
-//         tempElement.innerHTML = `${weather.temperature.value}° <span>C</span>`;
-//         weather.temperature.unit = "celsius";
-//     }
-// });
+function getFiveDayForecast(city, apiKey) {
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
 
-function celsiusToFahrenheit( temperature ){
-    /* google how to convert celsius to fahrenheit */
-    return ( temperature * 9/5 ) + 32;
+    fetch(forecastUrl)
+        .then(response => response.json())
+        .then(data => displayFiveDayForecast(data))
+        .catch(error => console.error('Error fetching forecast data:', error));
 }
 
-// function displayWeather(weather){
-// iconElement.innerHTML = 
-//  `<img src="icons/${weather.iconId}.png"/>`;
- 
-// tempElement.innerHTML = 
-//  `${weather.temperature.value} ° <span>C</span>`;
- 
-// descElement.innerHTML =
-//  `weather.description`;
- 
-// locationElement.innerHTML = 
-// `${weather.city}, ${weather.country}`;
-// }
-document.getElementById("searchbtn").onclick=getWeather
+function displayCurrentWeather(data) {
+    const forecastDiv = document.getElementById('forecast');
+    forecastDiv.innerHTML = `
+        <h3>${data.name} (${new Date().toLocaleDateString()})</h3>
+        <p>Temperature: ${data.main.temp} °C</p>
+        <p>Humidity: ${data.main.humidity}%</p>
+        <p>Wind Speed: ${data.wind.speed} m/s</p>
+    `;
+}
+
+function displayFiveDayForecast(data) {
+    const fiveDayDiv = document.getElementById('5day');
+    fiveDayDiv.innerHTML = '';
+
+    // Filter and display the forecast data for 12:00 PM each day
+    const forecast = data.list.filter(item => item.dt_txt.includes('12:00:00'));
+    forecast.forEach(day => {
+        const date = new Date(day.dt_txt).toLocaleDateString();
+        fiveDayDiv.innerHTML += `
+            <div class="col-md-2 card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">${date}</h6>
+                    <p class="card-text">Temp: ${day.main.temp} °C</p>
+                    <p class="card-text">Humidity: ${day.main.humidity}%</p>
+                </div>
+            </div>
+        `;
+    });
+}
+
+function saveSearch(city) {
+    let oldSearch = JSON.parse(localStorage.getItem('cities')) || [];
+    if (!oldSearch.includes(city)) {
+        oldSearch.push(city);
+        localStorage.setItem('cities', JSON.stringify(oldSearch));
+        updateSearchHistory();
+    }
+}
+
+function updateSearchHistory() {
+    const oldSearchList = document.getElementById('old-search');
+    oldSearchList.innerHTML = '';
+    const cities = JSON.parse(localStorage.getItem('cities')) || [];
+    cities.forEach(city => {
+        const li = document.createElement('li');
+        li.classList.add('list-group-item');
+        li.textContent = city;
+        li.addEventListener('click', function() {
+            getWeather(city);
+        });
+        oldSearchList.appendChild(li);
+    });
+}
+
+// Initialize search history on page load
+updateSearchHistory();
