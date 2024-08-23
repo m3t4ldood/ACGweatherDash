@@ -1,4 +1,4 @@
-document.getElementById('searchbtn').addEventListener('click', function() {
+document.getElementById('searchbtn').addEventListener('click', function () {
     const city = document.getElementById('searchval').value.trim();
     if (city) {
         getWeather(city);
@@ -34,9 +34,12 @@ function getFiveDayForecast(city, apiKey) {
 
 function displayCurrentWeather(data) {
     const forecastDiv = document.getElementById('forecast');
+    const tempCelsius = data.main.temp;
+    const tempFahrenheit = (tempCelsius * 9/5) + 32; // Convert Celsius to Fahrenheit
+
     forecastDiv.innerHTML = `
         <h3>${data.name} (${new Date().toLocaleDateString()})</h3>
-        <p>Temperature: ${data.main.temp} °C</p>
+        <p>Temperature: ${tempCelsius.toFixed(1)} °C / ${tempFahrenheit.toFixed(1)} °F</p>
         <p>Humidity: ${data.main.humidity}%</p>
         <p>Wind Speed: ${data.wind.speed} m/s</p>
     `;
@@ -50,11 +53,14 @@ function displayFiveDayForecast(data) {
     const forecast = data.list.filter(item => item.dt_txt.includes('12:00:00'));
     forecast.forEach(day => {
         const date = new Date(day.dt_txt).toLocaleDateString();
+        const tempCelsius = day.main.temp;
+        const tempFahrenheit = (tempCelsius * 9/5) + 32; // Convert Celsius to Fahrenheit
+
         fiveDayDiv.innerHTML += `
             <div class="col-md-2 card text-white bg-primary mb-3">
                 <div class="card-body">
                     <h6 class="card-title">${date}</h6>
-                    <p class="card-text">Temp: ${day.main.temp} °C</p>
+                    <p class="card-text">Temp: ${tempCelsius.toFixed(1)} °C / ${tempFahrenheit.toFixed(1)} °F</p>
                     <p class="card-text">Humidity: ${day.main.humidity}%</p>
                 </div>
             </div>
@@ -79,7 +85,7 @@ function updateSearchHistory() {
         const li = document.createElement('li');
         li.classList.add('list-group-item');
         li.textContent = city;
-        li.addEventListener('click', function() {
+        li.addEventListener('click', function () {
             getWeather(city);
         });
         oldSearchList.appendChild(li);
