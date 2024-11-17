@@ -1,58 +1,93 @@
-.searchColumn {
-    background-color: #eee;
+/* General body styling */
+body {
+  font-family: "Arial", sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  margin: 0;
+  padding: 0;
 }
 
-h2, h3 {
-    padding-top: 10px;
-    font-weight: 600;
+/* Navbar styling */
+.navbar {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-h4 {
-    font-weight: 600;
-}
-
+/* Container spacing */
 .container {
-    max-width: 1300px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.bg-primary, .input-group {
-    margin-bottom: 10px;
+/* Search section */
+#searchval {
+  border-radius: 5px;
 }
 
-.btn-group-vertical {
+#searchbtn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+#searchbtn:hover {
+  background-color: #0056b3;
+}
+
+/* Old search history */
+#old-search {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.list-group-item {
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.list-group-item:hover {
+  background-color: #e9ecef;
+}
+
+/* Forecast card styles */
+#forecast .card {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(145deg, #ffffff, #e6e6e6);
+}
+
+#forecast .card img {
+  max-width: 80px;
+}
+
+/* 5-day forecast styling */
+#5day .card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#5day .card p {
+  margin: 0.5em 0;
+}
+
+#5day .card img {
+  width: 60px;
+  margin: 0 auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  #forecast {
+    text-align: center;
+  }
+
+  #5day .card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+
+  #searchbtn {
     width: 100%;
-    display: inline-block;
-}
-
-.btn-light {
-    text-align: left;
-}
-
-.uvPadding {
-    padding: 7px;
-    border-radius: 0.3rem;
-}
-
-.card-body {
-    padding: 0.75rem;
-    padding-bottom: 0;
-}
-
-#currentWeather {
-    border: solid 1px rgba(0,0,0,.125);
-    border-radius: 0.3rem;
-    margin: 15px 0 15px 0;
-    padding: 15px;
-}
-
-#previousSearch {
-    margin-bottom: 15px;
-    max-height: 408px;
-    overflow: auto;
-}
-
-@media (max-width:768px) {
-    #previousSearch {
-        max-height: 152px;
-    }
+  }
 }
